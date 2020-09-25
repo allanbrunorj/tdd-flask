@@ -1,31 +1,15 @@
 from app import create_app
-from flask import Flask, template_rendered
+from flask import Flask
 
 def test_create_app_deve_retornar_um_app_flask():
 	assert isinstance(create_app(), Flask)
 
-def test_login_deve_retornar_sucesso():
-	app = create_app()
-	app.config['TESTING'] = True
-
-	with app.test_client() as client:
-		response = client.get('/login') # 1
+def test_login_deve_retornar_sucesso(client):
+	response = client.get('/login') # 1
 
 	assert response.status_code == 200 # 2
 
-def teste_endpoint_de_login_deve_retornar_o_template_de_login():
-	app = create_app()
-	app.config['TESTING'] = True
-
-	templates = []
-	def gravador_de_templates(remetende, template, context, **extra):
-		templates.append(template)
-
-	template_rendered.connect(gravador_de_templates, app)
-
-	with app.test_client() as client:
-		client.get('/login')
+def teste_endpoint_de_login_deve_retornar_o_template_de_login(client, templates):
+	client.get('/login')
 
 	assert templates[0].name == 'login.html'
-
-	template_rendered.disconnect(gravador_de_templates, app)
